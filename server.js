@@ -1,13 +1,16 @@
+require('dotenv').config();
 const express = require('express');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
-
 const app = express();
 const path = require('path');
 const server = http.createServer(app);
+
 const io = new Server(server, {
+
+
     cors: {
         origin: '*',
         methods: ['GET', 'POST']
@@ -18,10 +21,11 @@ app.use(cors());
 
 // Create a connection to the MySQL database
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'qqhDgjv6ukMu7a_i-zcv',
-    database: 'quizdb'
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,  // Should now have a value
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
+    port: process.env.MYSQL_PORT || 3306
 });
 
 // Connect to the database
