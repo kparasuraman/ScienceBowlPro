@@ -1,0 +1,217 @@
+<!DOCTYPE html>  
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Science Bowl Pro</title>
+    <style>
+        /* Reset margin and padding for the body and html elements */
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+        }
+
+        /* Style the header */
+        ul {
+            list-style-type: none;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        /* Style for the logo and nav items */
+        li {
+            transition: transform 0.3s, box-shadow 0.3s;
+            flex-grow: 1; /* Allow items to grow equally */
+        }
+
+        /* Links styling */
+        li a {
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            color: #4A77AD;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%; /* Fill the li container */
+        }
+
+        li a:hover:not(.active) {
+            color: white;
+        }
+
+        .active {
+            color: white;
+        }
+
+        /* Rectangle with rounded top corners styles */
+        .trapezoid {
+            width: 100%;
+            height: 40px; /* Adjust height as needed */
+            background-color: #4A77AD;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        /* Header rectangle styles */
+        .trapezoid-container {
+            width: 100%;
+            display: flex;
+            padding: 0;
+        }
+
+        .trapezoid-container li {
+            width: 100%;
+        }
+
+        .trapezoid-container li a {
+            display: block;
+            font-weight: bold;
+            padding: 0px;
+            color: #4A77AD;
+        }
+
+        /* Assign different background colors to rectangles */
+        .home .trapezoid {
+            background-color: #fe6960;
+        }
+
+        .practice .trapezoid {
+            background-color: #fec066;
+        }
+
+        .biology .trapezoid {
+            background-color: #feed8b;
+        }
+
+        .chemistry .trapezoid {
+            background-color: #8de38d;
+        }
+
+        .earth .trapezoid {
+            background-color: #b3eaf1;
+        }
+
+        .energy .trapezoid {
+            background-color: #c2b0e0;
+        }
+
+        .math .trapezoid {
+            background-color: #fec4d3;
+        }
+
+        .physics .trapezoid {
+            background-color: #eff1f1;
+        }
+
+        /* Hover effects for popping out */
+        .trapezoid-container li:hover .trapezoid {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Big box below the tabs */
+        .big-box {
+            width: 100%;
+            height: 1000px;
+            background-color: #fe6960;
+            color: #fe6960;
+            text-align: center;
+            line-height: 200px;
+            font-size: 24px;
+            position: relative;
+            top: 0px; /* Ensure it sits below the navigation */
+        }
+
+        .sticky-notes-container {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        /* Sticky note styles */
+        .sticky-note {
+            width: 150px;
+            height: 150px;
+            background-color: #fef68a;
+            padding: 20px;
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transform: rotate(-5deg);
+            transition: transform 0.2s ease;
+        }
+
+        .sticky-note:hover {
+            transform: scale(1.1) rotate(0deg);
+            box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .sticky-note a {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        /* Responsive design */
+        @media screen and (max-width: 600px) {
+            .trapezoid {
+                height: 50px;
+            }
+
+            .trapezoid a {
+                font-size: 14px;
+            }
+
+            .big-box {
+                font-size: 18px;
+                line-height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar with Rectangle Items -->
+    <ul class="trapezoid-container">
+        <li class="home"><a class="active" href="home.html"><div class="trapezoid">Home</div></a></li>
+        <li class="practice"><a href="practice.html"><div class="trapezoid">Practice</div></a></li>
+        <li class="biology"><a href="biology.html"><div class="trapezoid">Biology</div></a></li>
+        <li class="chemistry"><a href="chemistry.html"><div class="trapezoid">Chemistry</div></a></li>
+        <li class="earth"><a href="earth.html"><div class="trapezoid">Earth & Space</div></a></li>
+        <li class="energy"><a href="energy.html"><div class="trapezoid">Energy</div></a></li>
+        <li class="math"><a href="math.html"><div class="trapezoid">Math</div></a></li>
+        <li class="physics"><a href="physics.html"><div class="trapezoid">Physics</div></a></li>
+    </ul>
+
+    <!-- Big Box Below Tabs -->
+    <div class="big-box">
+        <img src="lightbulb.png.png" alt="Light Bulb" style="width:400px;height:400px;">
+        <img src="ScienceBowlHeader.png" alt="Heading" style="width:1000px;height:300px;">
+        <div class="sticky-notes-container">
+            <div class="sticky-note"><a href="biology.html">Biology</a></div>
+            <div class="sticky-note"><a href="chemistry.html">Chemistry</a></div>
+            <div class="sticky-note"><a href="earth.html">E&S Science</a></div>
+            <div class="sticky-note"><a href="energy.html">Energy</a></div>
+            <div class="sticky-note"><a href="math.html">Math</a></div>
+            <div class="sticky-note"><a href="physics.html">Physics</a></div>
+        </div>
+    </div>
+
+</body>
+</html>

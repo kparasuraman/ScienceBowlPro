@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequential Quiz</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            background-color: #f4f4f9;
+            color: #333;
+            font-family: Arial, sans-serif;
+        }
+        #buttons-container {
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            position: absolute;
+            top: 10px;
+        }
+        .nav-btn {
+            background: #4a77ad;
+            color: #fff;
+            padding: 10px 20px;
+            margin: 0 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .nav-btn:hover {
+            background: #2a9d8f;
+            transform: scale(1.1);
+        }
+        #quiz-container {
+            max-width: 850px;
+            min-width: 1050px;
+            min-height: 600px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 50px;
+            box-shadow: 5px 5px 402px rgba(0, 0, 0, 0.1);
+            position: relative;
+            border: 5px solid #8a8a8a;
+        }
+        #question-text, .option {
+            margin-bottom: 90px;
+            padding-left: 20px;
+        }
+        .option label {
+            display: block;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            background: #e0f5f2;
+            transition: 0.3s;
+        }
+        .option input[type="radio"] {
+            display: none;
+        }
+        .option label:hover, .option input[type="radio"]:checked + label {
+            background: #b3eaf1;
+        }
+        #submit-btn, #next-btn {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #submit-btn {
+            background: #4a77ad;
+            color: #fff;
+        }
+        #next-btn {
+            background: #2a9d8f;
+            color: #fff;
+            display: none;
+        }
+        #result {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        #timer {
+            font-size: 44px;
+            color: #ffffff;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            padding-top: -100px;
+            background-color: #4a77ad;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 0px solid #0400ff;
+            text-align: center;
+        }
+        #timer:before {
+            content: "";
+            position: absolute;
+            top: -10;
+            left: -10;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 6px solid transparent;
+            border-top-color: #ffffff;
+            animation: spin 2s linear infinite;
+            box-sizing: border-box;
+            z-index: 0;
+        }
+        #timer span {
+            font-size: 2em;
+            font-weight: bold;
+            z-index: 1;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="buttons-container">
+        <a href="mcq.html" class="nav-btn">Solo</a>
+        <a href="mcqOnline.html" class="nav-btn">Mulitplayer</a>
+    </div>
+
+    <div id="quiz-container">
+        <div id="timer">10s</div>
+        <div id="question-text">Loading question...</div>
+        <div id="options-container"></div>
+        <button id="submit-btn">Submit Answer</button>
+        <button id="next-btn">Next Question</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const submitBtn = document.getElementById('submit-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const result = document.getElementById('result');
+        const timerDisplay = document.getElementById('timer');
+
+        let questions = [];
+        let currentIndex = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let noAnswerCount = 0;
+        let hasAnswered = false;
+        let timer;
+        let timeLeft = 10;
+        let selectedAnswers = {};
+
+        async function loadQuiz() {
+            try {
+                const response = await fetch('http://localhost:3002/questions');
+                questions = await response.json();
+                shuffleQuestions(); // Shuffle the questions here
+                displayQuestion();
+            } catch (error) {
+                questionText.textContent = 'Failed to load questions.';
+                console.error('Error:', error);
+            }
+        }
+
+        function shuffleQuestions() {
+            // Fisher-Yates Shuffle algorithm to randomize the order of the questions
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]]; // Swap elements
+            }
+        }
+
+        function startTimer() {
+            timeLeft = 10;
+            timerDisplay.textContent = ` ${timeLeft}s`;
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    noAnswerCount++;
+                    result.textContent = 'Time\'s up! Moving to next question...';
+                    result.style.color = 'red';
+                    setTimeout(nextQuestion, 2000);
+                }
+            }, 1000);
+        }
+
+        function displayQuestion() {
+            clearInterval(timer);
+            const currentQuestion = questions[currentIndex];
+            questionText.textContent = currentQuestion.text;
+            optionsContainer.innerHTML = '';
+            result.textContent = '';
+
+            const options = ["option_a", "option_b", "option_c", "option_d"];
+            const labels = ["W", "X", "Y", "Z"];
+            options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                const isChecked = selectedAnswers[currentIndex] === labels[index] ? "checked" : "";
+                optionElement.innerHTML = ` 
+                    <input type="radio" id="option${index}" name="answer" value="${labels[index]}" ${isChecked}> 
+                    <label for="option${index}">${labels[index]}) ${currentQuestion[option]}</label> 
+                `;
+                optionsContainer.appendChild(optionElement);
+            });
+
+            hasAnswered = false;
+            submitBtn.disabled = false;
+            nextBtn.style.display = 'none';
+            startTimer();
+        }
+
+        function checkAnswer() {
+            clearInterval(timer);
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            const correctAnswer = questions[currentIndex].correct_option;
+            const selectedValue = selectedOption ? selectedOption.value : null;
+
+            // Save the selected answer for this question
+            selectedAnswers[currentIndex] = selectedValue;
+
+            if (!selectedValue) {
+                result.textContent = 'No answer selected.';
+                noAnswerCount++;
+            } else if (selectedValue === correctAnswer) {
+                result.textContent = 'Correct!';
+                result.style.color = 'green';
+                correctCount++;
+            } else {
+                result.textContent = `Incorrect! Correct answer: ${correctAnswer}`;
+                result.style.color = 'red';
+                incorrectCount++;
+            }
+
+            hasAnswered = true;
+            submitBtn.disabled = true;
+            nextBtn.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                displayQuestion();
+            } else {
+                showSummary();
+            }
+        }
+
+        function showSummary() {
+            clearInterval(timer);
+            questionText.textContent = 'Quiz Completed!';
+            optionsContainer.innerHTML = `
+                <p>Correct: ${correctCount}</p>
+                <p>Incorrect: ${incorrectCount}</p>
+                <p>No Answer: ${noAnswerCount}</p>
+            `;
+            submitBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+        }
+
+        submitBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', nextQuestion);
+        window.onload = loadQuiz;
+    </script>
+</body>
+</html>
