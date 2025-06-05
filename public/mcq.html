@@ -7,7 +7,6 @@
  <style>
    /* === Original desktop styles unchanged except score container === */
 
-
    body {
      display: flex;
      justify-content: center;
@@ -21,7 +20,6 @@
      margin: 0;
      padding-top: 80px; /* reserve space for top bar */
    }
-
 
    #quiz-container {
      max-width: 850px;
@@ -37,12 +35,10 @@
      /* no change */
    }
 
-
    #question-text, .option {
      margin-bottom: 90px;
      padding-left: 20px;
    }
-
 
    .option label {
      display: block;
@@ -53,17 +49,14 @@
      transition: 0.3s;
    }
 
-
    .option input[type="radio"] {
      display: none;
    }
-
 
    .option label:hover,
    .option input[type="radio"]:checked + label {
      background: #b3eaf1;
    }
-
 
    #submit-btn, #next-btn {
      width: 100%;
@@ -74,12 +67,10 @@
      cursor: pointer;
    }
 
-
    #submit-btn {
      background: #4a77ad;
      color: #fff;
    }
-
 
    #next-btn {
      background: #2a9d8f;
@@ -87,12 +78,10 @@
      display: none;
    }
 
-
    #result {
      font-weight: bold;
      margin-top: 20px;
    }
-
 
    #timer {
        font-size: 24px;
@@ -111,7 +100,7 @@
        text-align: center;
        z-index: 10;
      }
-#timer:before {
+   #timer:before {
      content: "";
      position: absolute;
      top: -10;
@@ -130,15 +119,13 @@
     100% { transform: rotate(360deg); }
   }
 
-      #timer span {
-       font-size: 2em;
-       font-weight: bold;
-       z-index: 0;
-     }
-
+  #timer span {
+    font-size: 2em;
+    font-weight: bold;
+    z-index: 0;
+  }
 
    /* === DESKTOP: score-timer container as top horizontal bar === */
-
 
    #score-timer-container {
      position: fixed;
@@ -162,7 +149,6 @@
      box-sizing: border-box;
    }
 
-
    #score-timer-container p {
      margin: 0;
      font-size: 16px;
@@ -170,22 +156,35 @@
      text-align: center;
    }
 
-
    #score-timer-container span.value {
      font-size: 20px;
      margin-left: 8px;
      color: #f7d794;
    }
 
+   /* Close button for mobile */
+   #close-score-btn {
+     display: none;
+     position: absolute;
+     top: 5px;
+     right: 10px;
+     background: transparent;
+     border: none;
+     font-size: 2.5rem;
+     color: white;
+     cursor: pointer;
+     user-select: none;
+     font-weight: bold;
+     line-height: 1;
+     z-index: 1000;
+   }
 
    /* === MOBILE ONLY CHANGES === */
-
 
    /* Hide toggle button on desktop */
    #toggle-score-btn {
      display: none;
    }
-
 
    @media (max-width: 768px) {
      /* Reset body padding-top */
@@ -193,7 +192,6 @@
        padding-top: 0;
        flex-direction: column;
      }
-
 
      /* Show toggle button on phones */
      #toggle-score-btn {
@@ -213,7 +211,6 @@
        user-select: none;
      }
 
-
      /* On phones, hide the score-timer container by default */
      #score-timer-container {
        display: none !important; /* hide by default on phones */
@@ -230,26 +227,95 @@
        box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
      }
 
+     /* Show close button on phones */
+     #close-score-btn {
+       display: block;
+     }
 
      /* When toggled active, show the container */
      #score-timer-container.active {
        display: flex !important;
      }
    }
+   @media (max-width: 768px) {
+    body {
+      padding-top: 0;
+      flex-direction: column;
+      margin: 0 10px; /* small horizontal margin */
+      height: auto;   /* let height flow */
+    }
+  
+    #quiz-container {
+      max-width: 100%;
+      min-width: auto;
+      width: 100vw;           /* full viewport width */
+      height: auto;           /* auto height for scrolling if needed */
+      max-height: 90vh;       /* max height to not overflow screen */
+      margin: 10px auto;
+      padding: 15px 10px;
+      border-radius: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      overflow-y: auto;       /* allow vertical scroll if content overflows */
+      box-sizing: border-box;
+    }
+  
+    #question-text, .option {
+      margin-bottom: 30px;    /* reduce vertical spacing */
+      padding-left: 10px;
+      font-size: 1.1rem;
+    }
+  
+    #timer {
+      width: 70px !important;
+      height: 70px !important;
+      font-size: 1.3rem !important;
+      top: 5px !important;
+      right: 5px !important;
+    }
+  
+    #submit-btn, #next-btn {
+      font-size: 1rem;
+      padding: 12px 15px;
+      border-radius: 12px;
+    }
+  }
+  @media (max-width: 768px) {
+
+  /* reposition timer above question, centered */
+  #timer {
+    position: relative !important;  /* remove absolute */
+    top: auto !important;
+    right: auto !important;
+    margin: 0 auto 15px auto;
+    width: 70px !important;
+    height: 70px !important;
+    font-size: 1.3rem !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  /* Show Score button - move above bottom and right aligned with margin */
+  #toggle-score-btn {
+    bottom: 100px !important;  /* push up a bit */
+    right: 15px !important;
+    padding: 12px 18px;
+    border-radius: 14px;
+    font-size: 1rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+}
  </style>
 </head>
 <body>
  <div id="score-timer-container">
+   <button id="close-score-btn" aria-label="Close score panel">×</button>
    <p>Correct: <span id="correct-count" class="value">0</span></p>
    <p>Incorrect: <span id="incorrect-count" class="value">0</span></p>
    <p>No Answer: <span id="noanswer-count" class="value">0</span></p>
    <p>Elapsed Time: <span id="elapsed-time" class="value">0:00</span></p>
  </div>
 
-
  <!-- Mobile Toggle Button -->
  <button id="toggle-score-btn" aria-label="Toggle score and timer visibility">Show Score</button>
-
 
  <div id="quiz-container">
    <div id="timer"><span>10s</span></div>
@@ -260,9 +326,7 @@
    <div id="result"></div>
  </div>
 
-
  <script src="questions.js"></script>
-
 
  <script>
    const questionText = document.getElementById('question-text');
@@ -272,14 +336,13 @@
    const result = document.getElementById('result');
    const timerDisplay = document.getElementById('timer').querySelector("span");
 
-
    const correctCountEl = document.getElementById('correct-count');
    const incorrectCountEl = document.getElementById('incorrect-count');
    const noAnswerCountEl = document.getElementById('noanswer-count');
    const elapsedTimeEl = document.getElementById('elapsed-time');
    const scoreTimerContainer = document.getElementById('score-timer-container');
    const toggleScoreBtn = document.getElementById('toggle-score-btn');
-
+   const closeScoreBtn = document.getElementById('close-score-btn');
 
    let currentIndex = 0;
    let correctCount = 0;
@@ -292,14 +355,12 @@
    let elapsedSeconds = 0;
    let elapsedTimer;
 
-
    function shuffleQuestions() {
      for (let i = questions.length - 1; i > 0; i--) {
        const j = Math.floor(Math.random() * (i + 1));
        [questions[i], questions[j]] = [questions[j], questions[i]];
      }
    }
-
 
    function startTimer() {
      timeLeft = 10;
@@ -318,7 +379,6 @@
      }, 1000);
    }
 
-
    function startElapsedTimer() {
      elapsedTimer = setInterval(() => {
        elapsedSeconds++;
@@ -326,11 +386,9 @@
      }, 1000);
    }
 
-
    function stopElapsedTimer() {
      clearInterval(elapsedTimer);
    }
-
 
    function formatElapsedTime(seconds) {
      const mins = Math.floor(seconds / 60);
@@ -338,13 +396,11 @@
      return `${mins}:${secs.toString().padStart(2, '0')}`;
    }
 
-
    function updateCounters() {
      correctCountEl.textContent = correctCount;
      incorrectCountEl.textContent = incorrectCount;
      noAnswerCountEl.textContent = noAnswerCount;
    }
-
 
    function displayQuestion() {
      clearInterval(timer);
@@ -352,7 +408,6 @@
      questionText.textContent = currentQuestion.text;
      optionsContainer.innerHTML = "";
      result.textContent = "";
-
 
      const options = ["option_a", "option_b", "option_c", "option_d"];
      const labels = ["W", "X", "Y", "Z"];
@@ -367,13 +422,11 @@
        optionsContainer.appendChild(optionElement);
      });
 
-
      hasAnswered = false;
      submitBtn.disabled = false;
      nextBtn.style.display = "none";
      startTimer();
    }
-
 
    function checkAnswer() {
      clearInterval(timer);
@@ -381,9 +434,7 @@
      const correctAnswer = questions[currentIndex].correct_option;
      const selectedValue = selectedOption ? selectedOption.value : null;
 
-
      selectedAnswers[currentIndex] = selectedValue;
-
 
      if (!selectedValue) {
        result.textContent = "No answer selected.";
@@ -398,13 +449,11 @@
        incorrectCount++;
      }
 
-
      updateCounters();
      hasAnswered = true;
      submitBtn.disabled = true;
      nextBtn.style.display = "block";
    }
-
 
    function nextQuestion() {
      if (currentIndex < questions.length - 1) {
@@ -414,7 +463,6 @@
        showSummary();
      }
    }
-
 
    function showSummary() {
      clearInterval(timer);
@@ -430,16 +478,15 @@
      result.textContent = "";
    }
 
-
-   submitBtn.addEventListener("click", checkAnswer);
-   nextBtn.addEventListener("click", nextQuestion);
-
-
    toggleScoreBtn.addEventListener("click", () => {
      scoreTimerContainer.classList.toggle("active");
      toggleScoreBtn.textContent = scoreTimerContainer.classList.contains("active") ? "Hide Score" : "Show Score";
    });
 
+   closeScoreBtn.addEventListener("click", () => {
+     scoreTimerContainer.classList.remove("active");
+     toggleScoreBtn.textContent = "Show Score";
+   });
 
    window.onload = () => {
      shuffleQuestions();
@@ -450,4 +497,3 @@
  </script>
 </body>
 </html>
-
