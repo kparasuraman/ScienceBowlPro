@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sequential Quiz</title>
     <style>
         body {
@@ -13,6 +13,7 @@
             background-color: #f4f4f9;
             color: #333;
             font-family: Arial, sans-serif;
+            position: relative;
         }
         #buttons-container {
             width: 100%;
@@ -91,7 +92,6 @@
             position: absolute;
             top: -5px;
             right: -5px;
-            padding-top: -100px;
             background-color: #4a77ad;
             border-radius: 50%;
             width: 100px;
@@ -102,6 +102,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             border: 0px solid #0400ff;
             text-align: center;
+            z-index: 10;
         }
         #timer:before {
             content: "";
@@ -130,13 +131,40 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* New counter box at top-right */
+        #score-timer-container {
+            position: left;
+            top: 15px;
+            right: 15px;
+            background: #4a77ad;
+            color: white;
+            border-radius: 12px;
+            padding: 15px 25px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 20;
+            width: 220px;
+            user-select: none;
+        }
+        #score-timer-container p {
+            margin: 6px 0;
+            font-size: 14px;
+        }
+        #score-timer-container span.value {
+            font-size: 18px;
+            margin-left: 6px;
+            color: #f7d794;
+        }
     </style>
 </head>
 <body>
-    <div id="buttons-container">
+    <!-- <div id="buttons-container">
         <a href="mcq.html" class="nav-btn">Solo</a>
         <a href="mcqOnline.html" class="nav-btn">Mulitplayer</a>
     </div>
+-->
 
     <div id="quiz-container">
         <div id="timer">10s</div>
@@ -147,6 +175,17 @@
         <div id="result"></div>
     </div>
 
+    <!-- New container for counters and elapsed time -->
+    <div id="score-timer-container">
+        <p>Correct: <span id="correct-count" class="value">0</span></p>
+        <p>Incorrect: <span id="incorrect-count" class="value">0</span></p>
+        <p>No Answer: <span id="noanswer-count" class="value">0</span></p>
+        <p>Elapsed Time: <span id="elapsed-time" class="value">0:00</span></p>
+    </div>
+
+    <!-- Include questions.js first -->
+    <script src="questions.js"></script>
+
     <script>
         const questionText = document.getElementById('question-text');
         const optionsContainer = document.getElementById('options-container');
@@ -155,7 +194,13 @@
         const result = document.getElementById('result');
         const timerDisplay = document.getElementById('timer');
 
-        let questions = [];
+        // New elements for counters & time
+        const correctCountEl = document.getElementById('correct-count');
+        const incorrectCountEl = document.getElementById('incorrect-count');
+        const noAnswerCountEl = document.getElementById('noanswer-count');
+        const elapsedTimeEl = document.getElementById('elapsed-time');
+
+        // `questions` is now defined in questions.js
         let currentIndex = 0;
         let correctCount = 0;
         let incorrectCount = 0;
@@ -165,65 +210,80 @@
         let timeLeft = 10;
         let selectedAnswers = {};
 
-        async function loadQuiz() {
-            try {
-                const response = await fetch('http://localhost:3002/questions');
-                questions = await response.json();
-                shuffleQuestions(); // Shuffle the questions here
-                displayQuestion();
-            } catch (error) {
-                questionText.textContent = 'Failed to load questions.';
-                console.error('Error:', error);
-            }
-        }
+        // Stopwatch for total elapsed quiz time
+        let elapsedSeconds = 0;
+        let elapsedTimer;
 
         function shuffleQuestions() {
-            // Fisher-Yates Shuffle algorithm to randomize the order of the questions
             for (let i = questions.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [questions[i], questions[j]] = [questions[j], questions[i]]; // Swap elements
+                [questions[i], questions[j]] = [questions[j], questions[i]];
             }
         }
 
         function startTimer() {
             timeLeft = 10;
-            timerDisplay.textContent = ` ${timeLeft}s`;
+            timerDisplay.textContent = `${timeLeft}s`;
             timer = setInterval(() => {
                 timeLeft--;
                 timerDisplay.textContent = `${timeLeft}s`;
                 if (timeLeft <= 0) {
                     clearInterval(timer);
                     noAnswerCount++;
-                    result.textContent = 'Time\'s up! Moving to next question...';
-                    result.style.color = 'red';
+                    updateCounters();
+                    result.textContent = "Time's up! Moving to next question...";
+                    result.style.color = "red";
                     setTimeout(nextQuestion, 2000);
                 }
             }, 1000);
+        }
+
+        function startElapsedTimer() {
+            elapsedTimer = setInterval(() => {
+                elapsedSeconds++;
+                elapsedTimeEl.textContent = formatElapsedTime(elapsedSeconds);
+            }, 1000);
+        }
+
+        function stopElapsedTimer() {
+            clearInterval(elapsedTimer);
+        }
+
+        function formatElapsedTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateCounters() {
+            correctCountEl.textContent = correctCount;
+            incorrectCountEl.textContent = incorrectCount;
+            noAnswerCountEl.textContent = noAnswerCount;
         }
 
         function displayQuestion() {
             clearInterval(timer);
             const currentQuestion = questions[currentIndex];
             questionText.textContent = currentQuestion.text;
-            optionsContainer.innerHTML = '';
-            result.textContent = '';
+            optionsContainer.innerHTML = "";
+            result.textContent = "";
 
             const options = ["option_a", "option_b", "option_c", "option_d"];
             const labels = ["W", "X", "Y", "Z"];
             options.forEach((option, index) => {
-                const optionElement = document.createElement('div');
-                optionElement.classList.add('option');
+                const optionElement = document.createElement("div");
+                optionElement.classList.add("option");
                 const isChecked = selectedAnswers[currentIndex] === labels[index] ? "checked" : "";
-                optionElement.innerHTML = ` 
-                    <input type="radio" id="option${index}" name="answer" value="${labels[index]}" ${isChecked}> 
-                    <label for="option${index}">${labels[index]}) ${currentQuestion[option]}</label> 
+                optionElement.innerHTML = `
+                    <input type="radio" id="option${index}" name="answer" value="${labels[index]}" ${isChecked}>
+                    <label for="option${index}">${labels[index]}) ${currentQuestion[option]}</label>
                 `;
                 optionsContainer.appendChild(optionElement);
             });
 
             hasAnswered = false;
             submitBtn.disabled = false;
-            nextBtn.style.display = 'none';
+            nextBtn.style.display = "none";
             startTimer();
         }
 
@@ -233,25 +293,26 @@
             const correctAnswer = questions[currentIndex].correct_option;
             const selectedValue = selectedOption ? selectedOption.value : null;
 
-            // Save the selected answer for this question
             selectedAnswers[currentIndex] = selectedValue;
 
             if (!selectedValue) {
-                result.textContent = 'No answer selected.';
+                result.textContent = "No answer selected.";
                 noAnswerCount++;
             } else if (selectedValue === correctAnswer) {
-                result.textContent = 'Correct!';
-                result.style.color = 'green';
+                result.textContent = "Correct!";
+                result.style.color = "green";
                 correctCount++;
             } else {
                 result.textContent = `Incorrect! Correct answer: ${correctAnswer}`;
-                result.style.color = 'red';
+                result.style.color = "red";
                 incorrectCount++;
             }
 
+            updateCounters();
+
             hasAnswered = true;
             submitBtn.disabled = true;
-            nextBtn.style.display = 'block';
+            nextBtn.style.display = "block";
         }
 
         function nextQuestion() {
@@ -265,19 +326,27 @@
 
         function showSummary() {
             clearInterval(timer);
-            questionText.textContent = 'Quiz Completed!';
+            stopElapsedTimer();
+            questionText.textContent = "Quiz Completed!";
             optionsContainer.innerHTML = `
                 <p>Correct: ${correctCount}</p>
                 <p>Incorrect: ${incorrectCount}</p>
                 <p>No Answer: ${noAnswerCount}</p>
             `;
-            submitBtn.style.display = 'none';
-            nextBtn.style.display = 'none';
+            submitBtn.style.display = "none";
+            nextBtn.style.display = "none";
+            result.textContent = "";
         }
 
-        submitBtn.addEventListener('click', checkAnswer);
-        nextBtn.addEventListener('click', nextQuestion);
-        window.onload = loadQuiz;
+        submitBtn.addEventListener("click", checkAnswer);
+        nextBtn.addEventListener("click", nextQuestion);
+
+        window.onload = () => {
+            shuffleQuestions();
+            displayQuestion();
+            updateCounters();
+            startElapsedTimer();
+        };
     </script>
 </body>
 </html>
