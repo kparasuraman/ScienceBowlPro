@@ -488,6 +488,8 @@
      toggleScoreBtn.textContent = "Show Score";
    });
 
+submitBtn.addEventListener('click', checkAnswer);
+nextBtn.addEventListener('click', nextQuestion);
    window.onload = () => {
      shuffleQuestions();
      displayQuestion();
