@@ -141,6 +141,6 @@ app.get('/mcqOnline', (req, res) => {
 
 // Start the server
 const PORT = 3002;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0',() => {
     console.log(`Server running on port ${PORT}`);
 });
